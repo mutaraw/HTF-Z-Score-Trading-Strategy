@@ -1,0 +1,80 @@
+//@version=6
+// HTF Z-Score Trading Strategy
+// -----------------------------
+// Description:
+//     - Retrieves higher-timeframe (HTF) close prices.
+//     - Calculates an exponential moving average (EMA) and standard deviation on lower timeframe close data.
+//     - Computes a z-score to normalize the difference between HTF close and EMA.
+//     - Generates buy/sell signals based on crossovers of the z-score relative to specified thresholds.
+    
+// Parameters:
+//     - HTF Timeframe: The higher timeframe for reference data.
+//     - Z-Score Lookback: Number of bars to calculate standard deviation.
+//     - SSMA Period: Period for the EMA calculation.
+//     - Minute-Based Z-Score Storage Interval: Frequency at which the z-score is updated (for potential smoothing).
+//     - Trade Baselines: Thresholds for triggering long and short entries.
+    
+// Pros:
+//     - Uses higher timeframe context to reduce noise.
+//     - Normalizes data via z-score for comparability.
+    
+// Cons:
+//     - Lookahead settings might cause repainting if not used carefully but with tab or desktop reload per-minute, false signals can be filtered.
+//     - Simplistic smoothing may require further refinement.
+    
+// Author: Tugume William Mutara (watchdawg2025)
+// Copyright © 2025. All rights reserved.
+
+strategy("HTF Z-Score Trading Strategy", overlay=false, process_orders_on_close=true, use_bar_magnifier=true)
+
+// ===== Input Parameters =====
+htfTimeframe      = input.timeframe("10", title="Higher Timeframe (HTF)")
+zScoreLookback    = input.int(10, title="Z-Score Lookback Period", minval=2)
+emaPeriod         = input.int(10, title="EMA Period", minval=2)
+minuteSampleInterval = input.int(10, title="Minute-Based Z-Score Storage Interval", minval=1)
+longZScoreThreshold  = input.float(2.0, title="Long Trade Baseline (Z-Score Threshold)")
+shortZScoreThreshold = input.float(-2.0, title="Short Trade Baseline (Z-Score Threshold)")
+
+// ===== SMMA Function (Re-used if needed) =====
+calculateSMMA(src, length) =>
+    var float smmaValue = na
+    simpleMA = ta.sma(src, length)
+    smmaValue := na(smmaValue) ? simpleMA : (smmaValue * (length - 1) + src) / length
+    smmaValue
+
+// ===== Retrieve Higher Timeframe Close Price =====
+// Note: Using lookahead_on might introduce intrabar updates. Consider lookahead_off for more stable signals.
+htfClosePrice = request.security(syminfo.tickerid, htfTimeframe, close, lookahead=barmerge.lookahead_on, gaps=barmerge.gaps_on)
+
+// ===== Lower Timeframe Calculations =====
+currentMinute = minute(time)
+emaClose = ta.ema(close, emaPeriod)
+stdDevClose = ta.stdev(close, zScoreLookback)
+zScoreValue = (htfClosePrice - emaClose) / stdDevClose
+
+// ===== Optionally, Store/Sample Z-Score =====
+// Here we update the stored z-score value every minuteSampleInterval minutes.
+// This can help reduce noise by holding the last valid value.
+var float storedZScore = na
+if currentMinute % minuteSampleInterval == 0
+    storedZScore := zScoreValue
+else
+    storedZScore := nz(storedZScore[1])
+
+// ===== Plot Z-Score =====
+plot(storedZScore, color=color.orange, title="Z-Score", linewidth=2, style=plot.style_line)
+hline(0, "Trade Baseline", color=color.gray, linewidth=1)
+
+// ===== Generate Trading Signals =====
+longSignal  = ta.crossover(storedZScore, longZScoreThreshold)
+shortSignal = ta.crossunder(storedZScore, shortZScoreThreshold)
+
+if longSignal
+    alert("7877869830357,buy," + syminfo.ticker + ",risk=1", alert.freq_once_per_bar_close)
+    strategy.entry("Long", strategy.long, qty=1)
+    strategy.close("Short")
+
+if shortSignal
+    alert("7877869830357,sell," + syminfo.ticker + ",risk=1", alert.freq_once_per_bar_close)
+    strategy.entry("Short", strategy.short, qty=1)
+    strategy.close("Long")
