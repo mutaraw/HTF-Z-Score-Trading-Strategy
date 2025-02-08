@@ -1,7 +1,4 @@
 # HTF-Z-Score-Trading-Strategy
-
-//@version=6
-HTF Z-Score Trading Strategy
 -----------------------------
 # Description:
 - Retrieves higher-timeframe (HTF) close prices.
