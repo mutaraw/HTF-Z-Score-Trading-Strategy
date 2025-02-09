@@ -31,8 +31,23 @@ The core idea behind this strategy is to leverage the context of a higher timefr
 - Normalizes data via z-score for comparability.
 
 ## Cons:
-- Lookahead settings might cause repainting if not used carefully but with tab or desktop reload per-minute, false signals can be filtered.
+- Lookahead settings might cause repainting if not used carefully but with tab or desktop reload per-minute, false signals can be filtered. These pine script limitations can be dealt with in python.
 - Simplistic smoothing may require further refinement.
+
+## How to Use
+- Open TradingView: Open the TradingView platform and navigate to the chart of the asset you want to trade.
+
+- Open Pine Editor: Click on the "Pine Editor" button at the bottom of the TradingView interface.
+
+- Copy and Paste: Copy the code provided above and paste it into the Pine Editor.
+
+- Adjust Inputs: Modify the input parameters according to your preferences and trading strategy.  Pay careful attention to the HTF timeframe, lookback periods, and thresholds. Experiment to find what works best for your trading style and the specific market you're analyzing.
+
+- Add to Chart: Click the "Add to Chart" button to apply the strategy to your chart.
+
+- Backtesting:  Use TradingView's backtesting capabilities to evaluate the strategy's historical performance.  Be aware of the limitations of backtesting, as past performance is not indicative of future results. Consider walk-forward analysis or other techniques to reduce overfitting.
+
+- Alerts: Configure alerts in TradingView to receive notifications when trading signals are generated.  Remember to replace the placeholder phone number in the alert() function with your own.
 
 Author: Tugume William Mutara (watchdawg2025)
 Copyright © 2025. All rights reserved.
