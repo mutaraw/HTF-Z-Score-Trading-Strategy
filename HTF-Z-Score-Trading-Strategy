@@ -70,11 +70,9 @@ longSignal  = ta.crossover(storedZScore, longZScoreThreshold)
 shortSignal = ta.crossunder(storedZScore, shortZScoreThreshold)
 
 if longSignal
-    alert("7877869830357,buy," + syminfo.ticker + ",risk=1", alert.freq_once_per_bar_close)
     strategy.entry("Long", strategy.long, qty=1)
     strategy.close("Short")
 
 if shortSignal
-    alert("7877869830357,sell," + syminfo.ticker + ",risk=1", alert.freq_once_per_bar_close)
     strategy.entry("Short", strategy.short, qty=1)
     strategy.close("Long")
