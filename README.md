@@ -19,18 +19,18 @@ The core idea behind this strategy is to leverage the context of a higher timefr
 - Computes a z-score to normalize the difference between HTF close and EMA.
 - Generates buy/sell signals based on crossovers of the z-score relative to specified thresholds.
 
-# Parameters:
+## Parameters:
 - HTF Timeframe: The higher timeframe for reference data.
 - Z-Score Lookback: Number of bars to calculate standard deviation.
 - SSMA Period: Period for the EMA calculation.
 - Minute-Based Z-Score Storage Interval: Frequency at which the z-score is updated (for potential smoothing).
 - Trade Baselines: Thresholds for triggering long and short entries.
 
-# Pros:
+## Pros:
 - Uses higher timeframe context to reduce noise.
 - Normalizes data via z-score for comparability.
 
-# Cons:
+## Cons:
 - Lookahead settings might cause repainting if not used carefully but with tab or desktop reload per-minute, false signals can be filtered.
 - Simplistic smoothing may require further refinement.
 
